@@ -10,7 +10,6 @@ pub fn show(ui: &mut egui::Ui, achievements: &[u32], app: &App) {
         games::Game::Hsr => "hsr_achievements",
         games::Game::Gi => "gi_achievements",
         games::Game::Zzz => "zzz_achievements",
-        _ => unimplemented!(),
     };
 
     ui.label("Finished");
@@ -50,7 +49,6 @@ pub fn show(ui: &mut egui::Ui, achievements: &[u32], app: &App) {
             games::Game::Hsr => "",
             games::Game::Gi => "gi/",
             games::Game::Zzz => "zzz/",
-            _ => unimplemented!(),
         };
 
         let url = format!("https://stardb.gg/api/users/me/{prefix}achievements/completed");

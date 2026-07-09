@@ -71,7 +71,6 @@ impl Game {
                 Game::Hsr => hsr::sniff(&achievement_ids, &device_rx),
                 Game::Gi => gi::sniff(&achievement_ids, &device_rx),
                 Game::Zzz => zzz::sniff(&achievement_ids, &device_rx),
-                _ => unimplemented!(),
             };
             let achievements = match achievements {
                 Ok(achievements) => achievements,
@@ -127,7 +126,6 @@ impl Game {
             Game::Hsr => "/api/achievements",
             Game::Gi => "/api/gi/achievements",
             Game::Zzz => return Ok(vec![100101, 100102]), // Mocking ZZZ
-            _ => unimplemented!(),
         };
 
         let url = format!("https://stardb.gg{path}");
@@ -170,7 +168,6 @@ impl Game {
             Game::Hsr => "udp portrange 23301-23302",
             Game::Gi => "udp portrange 22101-22102",
             Game::Zzz => "udp",
-            _ => unimplemented!(),
         };
 
         tracing::info!("Running exporter with pcap...");
@@ -242,7 +239,6 @@ impl Game {
             Game::Hsr => (23301, 23302),
             Game::Gi => (22101, 22102),
             Game::Zzz => (0, 65535),
-            _ => unimplemented!(),
         };
         // let packet_filter = format!("udp portrange {}-{}", port_range.0, port_range.1);
 

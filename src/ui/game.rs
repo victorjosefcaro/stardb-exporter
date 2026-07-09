@@ -34,6 +34,13 @@ pub fn show(ui: &mut egui::Ui, app: &App) {
             }
         }
         games::Game::Zzz => {
+            if ui.button("Achievement Exporter").clicked() {
+                app.game.achievements(&app.message_tx);
+                app.message_tx
+                    .send(Message::GoTo(State::Waiting("Preparing".to_string())))
+                    .unwrap();
+            }
+
             if ui.button("Signal Exporter").clicked() {
                 app.message_tx.send(Message::GoTo(State::PullMenu)).unwrap();
             }
