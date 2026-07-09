@@ -9,6 +9,7 @@ pub fn show(ui: &mut egui::Ui, achievements: &[u32], app: &App) {
     let key = match app.game {
         games::Game::Hsr => "hsr_achievements",
         games::Game::Gi => "gi_achievements",
+        games::Game::Zzz => "zzz_achievements",
         _ => unimplemented!(),
     };
 
@@ -48,6 +49,7 @@ pub fn show(ui: &mut egui::Ui, achievements: &[u32], app: &App) {
         let prefix = match app.game {
             games::Game::Hsr => "",
             games::Game::Gi => "gi/",
+            games::Game::Zzz => "zzz/",
             _ => unimplemented!(),
         };
 

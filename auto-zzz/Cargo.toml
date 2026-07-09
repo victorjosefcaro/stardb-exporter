@@ -1,0 +1,12 @@
+[package]
+name = "auto-zzz"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+base64 = "0.22"
+etherparse = "0.16.0"
+kcp = { git = "https://github.com/hashblen/mhy-kcp" }
+protobuf = "3.7.1"
+tracing = "0.1"
+num-bigint = "0.4"

@@ -70,6 +70,7 @@ impl Game {
             let achievements = match self {
                 Game::Hsr => hsr::sniff(&achievement_ids, &device_rx),
                 Game::Gi => gi::sniff(&achievement_ids, &device_rx),
+                Game::Zzz => zzz::sniff(&achievement_ids, &device_rx),
                 _ => unimplemented!(),
             };
             let achievements = match achievements {
@@ -125,6 +126,7 @@ impl Game {
         let path = match self {
             Game::Hsr => "/api/achievements",
             Game::Gi => "/api/gi/achievements",
+            Game::Zzz => return Ok(vec![100101, 100102]), // Mocking ZZZ
             _ => unimplemented!(),
         };
 
@@ -167,6 +169,7 @@ impl Game {
         let packet_filer = match self {
             Game::Hsr => "udp portrange 23301-23302",
             Game::Gi => "udp portrange 22101-22102",
+            Game::Zzz => "udp",
             _ => unimplemented!(),
         };
 
@@ -238,6 +241,7 @@ impl Game {
         let port_range = match self {
             Game::Hsr => (23301, 23302),
             Game::Gi => (22101, 22102),
+            Game::Zzz => (0, 65535),
             _ => unimplemented!(),
         };
         // let packet_filter = format!("udp portrange {}-{}", port_range.0, port_range.1);

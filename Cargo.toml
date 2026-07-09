@@ -15,6 +15,7 @@ egui_extras = { version = "0.33.3", features = ["all_loaders"] }
 pcap = { version = "2.4.0", optional = true }
 regex = "1.12.3"
 auto-reliquary = { git = "https://github.com/hashblen/auto-reliquary", version = "1.2.0" }
+auto-zzz = { path = "./auto-zzz" }
 rfd = "0.17.2"
 self_update = { version = "0.43.1", features = [
     "archive-zip",
