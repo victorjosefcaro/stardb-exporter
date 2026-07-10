@@ -484,6 +484,7 @@ dependencies = [
  "kcp",
  "num-bigint",
  "protobuf",
+ "protobuf-codegen",
  "tracing",
 ]
 

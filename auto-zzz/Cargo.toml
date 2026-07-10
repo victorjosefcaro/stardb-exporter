@@ -10,3 +10,6 @@ kcp = { git = "https://github.com/hashblen/mhy-kcp" }
 protobuf = "3.7.1"
 tracing = "0.1"
 num-bigint = "0.4"
+
+[build-dependencies]
+protobuf-codegen = "3.7.1"
