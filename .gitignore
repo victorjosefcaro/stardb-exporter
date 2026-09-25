@@ -1,2 +1,7 @@
 /target
 /.direnv
+.vs/
+**/__pycache__/
+*.pyc
+tools/zzz_scanner/zzz_achievements.json
+scratch/
