@@ -6,8 +6,10 @@ A fast, lightweight, and 100% ToS-compliant visual scanner for Zenless Zone Zero
 
 ## Features
 - **100% Account Safe & ToS Compliant**: Never touches game memory, never injects into processes, and never touches network packets.
+- **Hands-Free Automation**: Automatically brings the game into focus, auto-scrolls down lists, navigates categories on the sidebar, and copies the export straight to your clipboard when finished.
 - **Hardware-Accelerated OCR**: Powered by Microsoft's built-in Windows OCR engine (~10–20ms per screen).
 - **Exact StarDB Mapping**: Uses the official live StarDB achievement database (with fuzzy matching) to map recognized titles to their exact IDs.
+- **Emergency Stop**: Press `ESC` at any time to instantly stop scanning and export whatever has been collected.
 - **Instant Clipboard Export**: Automatically formats and copies the required JSON directly to your clipboard:
   ```json
   {
@@ -21,32 +23,30 @@ A fast, lightweight, and 100% ToS-compliant visual scanner for Zenless Zone Zero
 
 ---
 
-## How to Use
+## How to Use (Zero Manual Input)
 
-### Method 1: 1-Click Batch Launcher
-Double-click **`run_scanner.bat`** in this folder.
-
-### Method 2: Command Line
-From the terminal, install dependencies (if not already installed) and run:
-```powershell
-pip install -r tools/zzz_scanner/requirements.txt
-python tools/zzz_scanner/scanner.py
-```
+1. Launch **Zenless Zone Zero** (in Windowed or Borderless Windowed mode) and open the **Achievements** menu.
+2. Double-click **`run_scanner.bat`** (or run `python tools/zzz_scanner/scanner.py`).
+3. Press <kbd>Enter</kbd> to start **Hands-Free Full Auto-Scan**.
+4. Take your hands off your mouse and keyboard! The scanner will:
+   - Bring Zenless Zone Zero into focus.
+   - Smoothly scroll through your achievements.
+   - Click through categories on the left sidebar.
+   - Detect when each list reaches the bottom.
+   - Play a chime when complete and copy the JSON straight to your clipboard.
+5. Open **[stardb.gg/import](https://stardb.gg/import)**, press <kbd>Ctrl</kbd> + <kbd>V</kbd>, and click **Import Achievements**!
 
 ---
 
 ## Scanning Modes
 
-### 1. Live Window Auto-Scanner (Fastest & Easiest)
-1. Launch Zenless Zone Zero (in Windowed or Borderless Windowed mode).
-2. Open the in-game **Achievements** menu.
-3. Select Option `[1]` in the scanner.
-4. Slowly scroll down your achievements list in-game. The scanner will automatically detect and beep as new completed achievements are discovered.
-5. Press `Enter` in the console when finished scrolling.
-6. The JSON is automatically copied to your clipboard!
-7. Navigate to **[stardb.gg/import](https://stardb.gg/import)**, press `Ctrl + V`, and click **Import**!
-
-### 2. Screenshot Snipping (`Win + Shift + S`)
-1. Press `Win + Shift + S` to capture a screenshot of your achievements window.
-2. Select Option `[2]` in the scanner.
-3. It will immediately read your clipboard screenshot, match the achievements, and update your export!
+- **[1] Hands-Free Full Auto-Scan (All Categories) [Default]**:
+  Navigates through categories and auto-scrolls every list to the bottom.
+- **[2] Hands-Free Auto-Scan (Current Category Only)**:
+  Auto-scrolls only the currently open category/list to the bottom.
+- **[3] Manual Live Scroll**:
+  You scroll the list manually at your own pace; the scanner detects and beeps in real time.
+- **[4] Scan Clipboard Screenshot**:
+  Snip an achievement view using `Win + Shift + S` and parse it from your clipboard.
+- **[5] Scan Image File**:
+  Parse an image file saved on disk.

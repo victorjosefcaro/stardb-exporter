@@ -47,7 +47,10 @@ class StarDB:
                 self.id_map[aid] = item
                 self.normalized_map[norm_name] = item
 
-            print(f"[StarDB] Loaded {len(self.achievements)} achievements into memory.")
+            self.series_names = sorted(list(set(x["series_name"] for x in self.achievements if x.get("series_name"))))
+            self.normalized_series_map = {normalize_text(s): s for s in self.series_names}
+
+            print(f"[StarDB] Loaded {len(self.achievements)} achievements ({len(self.series_names)} categories) into memory.")
         else:
             raise FileNotFoundError("Could not load StarDB achievement database.")
 
@@ -79,6 +82,20 @@ class StarDB:
         if best_ratio >= min_confidence:
             return best_match
 
+        return None
+
+    def match_series(self, ocr_text: str, min_confidence: float = 0.82) -> Optional[str]:
+        """Match an OCR-detected text against known ZZZ achievement series/categories."""
+        norm = normalize_text(ocr_text)
+        if len(norm) < 3:
+            return None
+        if norm in self.normalized_series_map:
+            return self.normalized_series_map[norm]
+        for s_norm, s_orig in self.normalized_series_map.items():
+            if len(s_norm) > 4 and (s_norm in norm or norm in s_norm):
+                return s_orig
+            if SequenceMatcher(None, norm, s_norm).ratio() >= min_confidence:
+                return s_orig
         return None
 
 if __name__ == "__main__":
