@@ -88,10 +88,12 @@ pub fn matches_achievement_all_data_notify(data: Vec<u8>) -> Option<Vec<Achievem
                             _ => Some(tag),
                         }
                     }
-                    // TODO: Replace 0 with a real common ZZZ achievement ID once known (e.g. from Hakush.in)
-                    // The anchor is used to identify which protobuf field contains achievement IDs.
-                    if value == 0 {
-                        tag_id = Some(tag)
+                    // Anchor achievements to deduce tag_id:
+                    // 1005001: "Life of a Proxy: Starting From Zero" (Prologue)
+                    // 1005002: "Welcome, New Employee!" (Chapter 1)
+                    // 1004001: "Movie Lovers Can't be Bad Guys" (Anby Trust Lv. 4)
+                    if value == 1005001 || value == 1005002 || value == 1004001 {
+                        tag_id = Some(tag);
                     }
                     if possible_tag_status.contains(&tag) {
                         if value > 3 {

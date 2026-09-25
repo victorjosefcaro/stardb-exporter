@@ -125,7 +125,7 @@ impl Game {
         let path = match self {
             Game::Hsr => "/api/achievements",
             Game::Gi => "/api/gi/achievements",
-            Game::Zzz => return Ok(vec![100101, 100102]), // Mocking ZZZ
+            Game::Zzz => "/api/zzz/achievements",
         };
 
         let url = format!("https://stardb.gg{path}");

@@ -308,7 +308,7 @@ impl GameSniffer {
 /// Run the heuristic achievement parser on raw proto body bytes.
 ///
 /// # Note
-/// The anchor achievement ID in ZZZ is currently a TODO placeholder — see
+/// Uses known common ZZZ achievements (e.g. `1005001`) as anchors — see
 /// `unk_util::matches_achievement_all_data_notify` for details.
 pub fn matches_achievement_packet(bytes: &[u8]) -> Option<Vec<Achievement>> {
     matches_achievement_all_data_notify(bytes.to_vec())
