@@ -23,10 +23,12 @@ A fast, lightweight, and 100% ToS-compliant visual scanner for Zenless Zone Zero
 
 ---
 
-## How to Use (Zero Manual Input)
+## How to Use (Zero Dependencies, Just Download & Run)
 
+### Method 1: Standalone Program (No Python needed!)
 1. Launch **Zenless Zone Zero** (in Windowed or Borderless Windowed mode) and open the **Achievements** menu.
-2. Double-click **`run_scanner.bat`** (or run `python tools/zzz_scanner/scanner.py`).
+2. Double-click **`zzz_scanner.exe`** (or **`run_scanner.bat`**).
+   *(This is a standalone compiled application—no Python or external libraries required!)*
 3. Press <kbd>Enter</kbd> to start **Hands-Free Full Auto-Scan**.
 4. Take your hands off your mouse and keyboard! The scanner will:
    - Bring Zenless Zone Zero into focus.

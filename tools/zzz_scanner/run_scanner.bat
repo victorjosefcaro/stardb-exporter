@@ -12,11 +12,25 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+:: If standalone executable exists, run it directly with ZERO dependencies!
+if exist "%~dp0zzz_scanner.exe" (
+    "%~dp0zzz_scanner.exe"
+    pause
+    exit /b
+)
+if exist "%~dp0..\..\dist\zzz_scanner.exe" (
+    "%~dp0..\..\dist\zzz_scanner.exe"
+    pause
+    exit /b
+)
+
 echo ========================================================
 echo       Zenless Zone Zero - StarDB Achievement Scanner
 echo ========================================================
 echo.
 
+:: Fallback to python if running directly from source files
+echo [!] Standalone executable not found, checking Python environment...
 python -c "import winsdk, PIL, pyperclip" 2>nul
 if %errorlevel% neq 0 (
     echo [!] Installing required Python packages...

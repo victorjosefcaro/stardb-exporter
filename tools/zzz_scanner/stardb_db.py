@@ -1,12 +1,19 @@
 import os
 import re
+import sys
 import json
 import urllib.request
 from difflib import SequenceMatcher
 from typing import Optional, Dict, List, Any
 
 API_URL = "https://stardb.gg/api/zzz/achievements"
-DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stardb_zzz_achievements.json")
+
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    BUNDLE_DIR = sys._MEIPASS
+else:
+    BUNDLE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DB_FILE = os.path.join(BUNDLE_DIR, "stardb_zzz_achievements.json")
 
 def normalize_text(text: str) -> str:
     """Normalize text by converting to lowercase and stripping punctuation/extra spaces."""

@@ -5,3 +5,6 @@
 *.pyc
 tools/zzz_scanner/zzz_achievements.json
 scratch/
+build/
+dist/
+*.spec

@@ -13,8 +13,13 @@ from ocr_engine import WindowsOcr
 from capture import WindowCapture
 from automation import InputController, WindowController
 
+if getattr(sys, "frozen", False):
+    APP_DIR = os.path.dirname(sys.executable)
+else:
+    APP_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DATE_PATTERN = re.compile(r"\b(202\d|2\d)[/.-]\d{1,2}[/.-]\d{1,2}\b")
-OUTPUT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zzz_achievements.json")
+OUTPUT_FILE = os.path.join(APP_DIR, "zzz_achievements.json")
 
 class ZzzAchievementScanner:
     def __init__(self):
