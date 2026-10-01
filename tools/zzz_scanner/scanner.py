@@ -318,18 +318,19 @@ class ZzzAchievementScanner:
         print("=" * 60)
         print("Instructions:")
         print("  1. Switch to Zenless Zone Zero (Achievements menu).")
-        print("  2. Scroll through your achievements with your mouse wheel")
-        print("     or drag the in-game scrollbar down.")
-        print("  3. Click into any other categories you want to scan.")
-        print("     (The scanner will automatically read the screen and beep")
-        print("      each time a new achievement is found!)")
-        print("  4. When finished, press [ESC] in-game or [Enter] in this window.")
+        print("  2. Scroll down your achievements list with your mouse wheel")
+        print("     or drag the in-game scrollbar.")
+        print("  3. Click into ANY other categories on the left sidebar and scroll")
+        print("     those as well! (The scanner stays active across all categories).")
+        print("  4. You will hear a beep every time newly discovered achievements appear.")
+        print("  5. When you have scrolled through all categories you want:")
+        print("     Press [F10] in-game or [Enter] in this console window.")
         print("=" * 60 + "\n")
 
         # Try to bring game window to front
         WindowController.focus_window(hwnd)
 
-        print("[*] LIVE SCANNER RUNNING... (Switch to game and scroll now!)\n")
+        print("[*] LIVE SCANNER ACTIVE (Switch to ZZZ, click & scroll through categories now!)\n")
 
         last_scan_time = 0
         scan_interval = 0.20 # 5 scans per second for high-speed responsiveness
@@ -338,14 +339,14 @@ class ZzzAchievementScanner:
         try:
             import msvcrt
             while True:
-                # Check for keyboard inputs to finish (ESC in-game or Enter in console)
-                if InputController.is_escape_pressed():
-                    print("\n[*] [ESC] detected! Finishing scan session...")
+                # Check for keyboard inputs to finish (F10 in-game or Enter in console)
+                if InputController.is_f10_pressed():
+                    print("\n[*] [F10] detected! Finishing scan session...")
                     break
 
                 if msvcrt.kbhit():
                     key = msvcrt.getch()
-                    if key in (b"\r", b"\n", b"q", b"Q", b"\x1b", b" "):
+                    if key in (b"\r", b"\n", b"q", b"Q", b" "):
                         print("\n[*] Key press detected! Finishing scan session...")
                         break
 

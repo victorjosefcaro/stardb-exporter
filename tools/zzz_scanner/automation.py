@@ -12,6 +12,7 @@ MOUSEEVENTF_LEFTDOWN = 0x0002
 MOUSEEVENTF_LEFTUP = 0x0004
 MOUSEEVENTF_WHEEL = 0x0800
 VK_ESCAPE = 0x1B
+VK_F10 = 0x79
 SW_RESTORE = 9
 
 class InputController:
@@ -19,6 +20,11 @@ class InputController:
     def is_escape_pressed() -> bool:
         """Returns True if the user pressed the Escape key."""
         return (user32.GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0
+
+    @staticmethod
+    def is_f10_pressed() -> bool:
+        """Returns True if the user pressed F10."""
+        return (user32.GetAsyncKeyState(VK_F10) & 0x8000) != 0
 
     @staticmethod
     def scroll(clicks: int):
