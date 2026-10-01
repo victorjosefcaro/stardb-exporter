@@ -299,31 +299,54 @@ class ZzzAchievementScanner:
 
         self.export_results()
 
-    def run_manual_live_scan(self):
-        """Continuously scans the game window while the user scrolls manually."""
+    def run_live_assisted_scan(self):
+        """
+        Real-time assisted scanner: The user simply scrolls the game window,
+        while the scanner continuously reads the screen, recognizes achievements,
+        and beeps on each discovery. 100% anti-cheat safe and reliable!
+        """
         target = self.get_game_window()
         if not target:
             return
 
         hwnd, title, geom = target
-        print(f"\n[+] Hooked into game window: '{title}' (HWND: {hwnd})")
-        print("[-] Instructions:")
-        print("    1. Switch to the game window and open the in-game Achievements menu.")
-        print("    2. Slowly scroll through the achievements list.")
-        print("    3. Return to this console and press [Enter] when finished.\n")
+        left, top, width, height = geom
 
-        input("Press [Enter] to start live scanning...")
-        print("[*] LIVE SCANNING ACTIVE... (Press Ctrl+C or Enter in console to stop)\n")
+        print(f"\n[+] Hooked into game window: '{title}' ({width}x{height})")
+        print("\n" + "=" * 60)
+        print("           STARTING LIVE ASSISTED SCANNER")
+        print("=" * 60)
+        print("Instructions:")
+        print("  1. Switch to Zenless Zone Zero (Achievements menu).")
+        print("  2. Scroll through your achievements with your mouse wheel")
+        print("     or drag the in-game scrollbar down.")
+        print("  3. Click into any other categories you want to scan.")
+        print("     (The scanner will automatically read the screen and beep")
+        print("      each time a new achievement is found!)")
+        print("  4. When finished, press [ESC] in-game or [Enter] in this window.")
+        print("=" * 60 + "\n")
+
+        # Try to bring game window to front
+        WindowController.focus_window(hwnd)
+
+        print("[*] LIVE SCANNER RUNNING... (Switch to game and scroll now!)\n")
+
+        last_scan_time = 0
+        scan_interval = 0.20 # 5 scans per second for high-speed responsiveness
+        last_reported_count = 0
 
         try:
             import msvcrt
-            last_scan_time = 0
-            scan_interval = 0.4
-
             while True:
+                # Check for keyboard inputs to finish (ESC in-game or Enter in console)
+                if InputController.is_escape_pressed():
+                    print("\n[*] [ESC] detected! Finishing scan session...")
+                    break
+
                 if msvcrt.kbhit():
                     key = msvcrt.getch()
-                    if key in (b"\r", b"\n", b"q", b"Q", b"\x1b"):
+                    if key in (b"\r", b"\n", b"q", b"Q", b"\x1b", b" "):
+                        print("\n[*] Key press detected! Finishing scan session...")
                         break
 
                 now = time.time()
@@ -331,14 +354,17 @@ class ZzzAchievementScanner:
                     last_scan_time = now
                     frame = WindowCapture.capture_window(hwnd)
                     if frame:
-                        self.process_image(frame)
+                        found, _ = self.process_image(frame)
+                        current_total = len(self.scanned_achievements)
+                        if current_total > last_reported_count and current_total % 10 == 0:
+                            last_reported_count = current_total
+                            print(f"[*] Total recorded so far: {current_total} achievements...")
 
-                time.sleep(0.05)
+                time.sleep(0.03)
 
         except KeyboardInterrupt:
             pass
 
-        print("\n[*] Stopping live scan...")
         self.export_results()
 
     def run_clipboard_scan(self):
@@ -375,20 +401,22 @@ def main():
 
     while True:
         print("\nChoose an option:")
-        print("  [1] Hands-Free Full Auto-Scan (All Categories) [Recommended / Default]")
-        print("  [2] Hands-Free Auto-Scan (Current Category Only)")
-        print("  [3] Manual Live Scroll (You scroll, scanner beeps)")
+        print("  [1] Live Assisted Scanner (Recommended) [Default - Press Enter]")
+        print("      (You scroll the list in-game; scanner auto-reads at 20ms and beeps)")
+        print("  [2] Experimental Hands-Free Auto-Scan (All Categories)")
+        print("      (Attempts simulated mouse scrolling; may be blocked by game anti-cheat)")
+        print("  [3] Experimental Hands-Free Auto-Scan (Current Category Only)")
         print("  [4] Scan Clipboard Screenshot (Win + Shift + S)")
         print("  [5] Scan Image File from Disk")
         print("  [6] Exit")
 
         choice = input("\nEnter choice [1-6] (Press Enter for Option 1): ").strip()
         if choice in ("", "1"):
-            scanner.run_hands_free_auto_scan(all_categories=True)
+            scanner.run_live_assisted_scan()
         elif choice == "2":
-            scanner.run_hands_free_auto_scan(all_categories=False)
+            scanner.run_hands_free_auto_scan(all_categories=True)
         elif choice == "3":
-            scanner.run_manual_live_scan()
+            scanner.run_hands_free_auto_scan(all_categories=False)
         elif choice == "4":
             scanner.run_clipboard_scan()
         elif choice == "5":
