@@ -18,7 +18,10 @@ if getattr(sys, "frozen", False):
 else:
     APP_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DATE_PATTERN = re.compile(r"\b(202\d|2\d)[/.-]\d{1,2}[/.-]\d{1,2}\b")
+DATE_PATTERN = re.compile(
+    r"\b(?:202\d|2\d)\s*[\/.\-]\s*\d{1,2}\s*[\/.\-]\s*\d{1,2}\b|"
+    r"\b\d{1,2}\s*[\/.\-]\s*\d{1,2}\s*[\/.\-]\s*(?:202\d|2\d)\b"
+)
 OUTPUT_FILE = os.path.join(APP_DIR, "zzz_achievements.json")
 
 class ZzzAchievementScanner:
@@ -32,6 +35,7 @@ class ZzzAchievementScanner:
         print("[OCR] OCR Engine ready.\n")
 
         self.scanned_achievements: Dict[int, Dict[str, Any]] = {}
+        self.skipped_incomplete: Set[int] = set()
         self.require_completion_date = True
 
     def process_image(self, img: Image.Image) -> Tuple[List[Dict[str, Any]], Set[str]]:
@@ -46,14 +50,18 @@ class ZzzAchievementScanner:
             return [], set()
 
         # Find all dates on this image with bounding boxes
-        date_boxes = []
+        date_entries = []
         for l in lines:
-            if DATE_PATTERN.search(l["text"]):
-                date_boxes.append(l["bbox"])
+            m = DATE_PATTERN.search(l["text"])
+            if m:
+                date_entries.append((m.group(0), l["bbox"]))
 
-        has_any_dates = len(date_boxes) > 0
+        has_any_dates = len(date_entries) > 0
         newly_found = []
         visible_titles: Set[str] = set()
+
+        # Dynamically scale vertical card height tolerance based on image height (e.g. 1080p, 1440p, 4K)
+        card_vertical_range = max(110, int(img.height * 0.14))
 
         for l in lines:
             text = l["text"]
@@ -67,25 +75,36 @@ class ZzzAchievementScanner:
                 title = match["name"]
                 visible_titles.add(title)
 
-                # Check if this achievement card is completed:
-                # In ZZZ, a completed achievement displays a completion date nearby.
-                is_completed = True
-                if self.require_completion_date and has_any_dates:
-                    # Check if there is a date vertically aligned with this achievement card (+/- 65px)
-                    card_y_mid = (l["bbox"][1] + l["bbox"][3]) / 2.0
-                    date_nearby = any(abs(((d[1] + d[3]) / 2.0) - card_y_mid) < 65 for d in date_boxes)
-                    is_completed = date_nearby
+                card_y_mid = (l["bbox"][1] + l["bbox"][3]) / 2.0
+                card_x_min = l["bbox"][0]
 
-                if is_completed and aid not in self.scanned_achievements:
-                    self.scanned_achievements[aid] = match
-                    newly_found.append(match)
+                # Match completion date vertically aligned with the card
+                matched_date = None
+                if has_any_dates:
+                    for d_str, d_box in date_entries:
+                        date_y_mid = (d_box[1] + d_box[3]) / 2.0
+                        if abs(date_y_mid - card_y_mid) <= card_vertical_range and d_box[0] >= card_x_min - 60:
+                            matched_date = d_str
+                            break
 
-                    try:
-                        winsound.MessageBeep(winsound.MB_OK)
-                    except Exception:
-                        pass
+                is_completed = (matched_date is not None) if self.require_completion_date else True
 
-                    print(f" [+] Found: {title} (ID: {aid}) - [{match['series_name']}]")
+                if is_completed:
+                    if aid not in self.scanned_achievements:
+                        self.scanned_achievements[aid] = match
+                        newly_found.append(match)
+
+                        try:
+                            winsound.MessageBeep(winsound.MB_OK)
+                        except Exception:
+                            pass
+
+                        date_info = f" [Date: {matched_date}]" if matched_date else ""
+                        print(f" [+] Found (Completed): {title} (ID: {aid}) - [{match['series_name']}]{date_info}")
+                else:
+                    if aid not in self.scanned_achievements and aid not in self.skipped_incomplete:
+                        self.skipped_incomplete.add(aid)
+                        print(f" [-] Incomplete / Locked: {title} (No completion date on card)")
 
         return newly_found, visible_titles
 
@@ -332,8 +351,9 @@ class ZzzAchievementScanner:
 
         print("[*] LIVE SCANNER ACTIVE (Switch to ZZZ, click & scroll through categories now!)\n")
 
+        self.skipped_incomplete.clear()
         last_scan_time = 0
-        scan_interval = 0.20 # 5 scans per second for high-speed responsiveness
+        scan_interval = 0.15 # ~7 scans per second for high-speed responsiveness
         last_reported_count = 0
 
         try:
@@ -357,11 +377,11 @@ class ZzzAchievementScanner:
                     if frame:
                         found, _ = self.process_image(frame)
                         current_total = len(self.scanned_achievements)
-                        if current_total > last_reported_count and current_total % 10 == 0:
+                        if current_total > last_reported_count and current_total % 5 == 0:
                             last_reported_count = current_total
                             print(f"[*] Total recorded so far: {current_total} achievements...")
 
-                time.sleep(0.03)
+                time.sleep(0.02)
 
         except KeyboardInterrupt:
             pass
@@ -401,19 +421,27 @@ def main():
     scanner = ZzzAchievementScanner()
 
     while True:
-        print("\nChoose an option:")
+        filter_status = "ONLY COMPLETED (Must have date)" if scanner.require_completion_date else "ALL VISIBLE (Record everything seen)"
+        print("\n" + "-" * 60)
+        print(f"Current Filter: [{filter_status}]")
+        print("Choose an option:")
         print("  [1] Live Assisted Scanner (Recommended) [Default - Press Enter]")
-        print("      (You scroll the list in-game; scanner auto-reads at 20ms and beeps)")
+        print("      (You scroll the list in-game; scanner auto-reads at 15ms and beeps)")
         print("  [2] Experimental Hands-Free Auto-Scan (All Categories)")
         print("      (Attempts simulated mouse scrolling; may be blocked by game anti-cheat)")
         print("  [3] Experimental Hands-Free Auto-Scan (Current Category Only)")
         print("  [4] Scan Clipboard Screenshot (Win + Shift + S)")
         print("  [5] Scan Image File from Disk")
+        print("  [C] Toggle Completion Filter (Completed-Only vs All-Visible)")
         print("  [6] Exit")
 
-        choice = input("\nEnter choice [1-6] (Press Enter for Option 1): ").strip()
+        choice = input("\nEnter choice [1-6, C] (Press Enter for Option 1): ").strip()
         if choice in ("", "1"):
             scanner.run_live_assisted_scan()
+        elif choice.lower() == "c":
+            scanner.require_completion_date = not scanner.require_completion_date
+            new_status = "ONLY COMPLETED (Must have date)" if scanner.require_completion_date else "ALL VISIBLE (Record everything seen)"
+            print(f"\n[+] Filter updated to: [{new_status}]")
         elif choice == "2":
             scanner.run_hands_free_auto_scan(all_categories=True)
         elif choice == "3":
@@ -426,7 +454,7 @@ def main():
         elif choice in ("6", "q", "exit"):
             break
         else:
-            print("Invalid choice, please select 1-6.")
+            print("Invalid choice, please select 1-6 or C.")
 
 if __name__ == "__main__":
     main()

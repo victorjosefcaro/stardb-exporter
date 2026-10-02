@@ -61,7 +61,7 @@ class StarDB:
         else:
             raise FileNotFoundError("Could not load StarDB achievement database.")
 
-    def match_title(self, ocr_text: str, min_confidence: float = 0.82) -> Optional[Dict[str, Any]]:
+    def match_title(self, ocr_text: str, min_confidence: float = 0.78) -> Optional[Dict[str, Any]]:
         """Match an OCR-detected line of text against known StarDB achievement titles."""
         norm_ocr = normalize_text(ocr_text)
         if len(norm_ocr) < 3:
@@ -71,10 +71,13 @@ class StarDB:
         if norm_ocr in self.normalized_map:
             return self.normalized_map[norm_ocr]
 
-        # Check substring containment
+        # Check substring containment with length safeguard
         for norm_title, item in self.normalized_map.items():
-            if len(norm_title) > 6 and (norm_title in norm_ocr or norm_ocr in norm_title):
-                return item
+            if len(norm_title) > 5:
+                if norm_title in norm_ocr:
+                    return item
+                if norm_ocr in norm_title and len(norm_ocr) >= len(norm_title) * 0.5:
+                    return item
 
         # Fuzzy match using SequenceMatcher
         best_match = None
